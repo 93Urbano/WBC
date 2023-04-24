@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="8.5.1">
+<eagle version="9.6.2">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -10514,7 +10514,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <part name="CAN" library="pinhead" library_urn="urn:adsk.eagle:library:325" deviceset="PINHD-1X2" device="" package3d_urn="urn:adsk.eagle:package:22435/2"/>
 <part name="VBAT" library="pinhead" library_urn="urn:adsk.eagle:library:325" deviceset="PINHD-1X2" device="" package3d_urn="urn:adsk.eagle:package:22435/2"/>
 <part name="GND16" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
-<part name="JP1" library="pinhead" library_urn="urn:adsk.eagle:library:325" deviceset="PINHD-1X6" device="" package3d_urn="urn:adsk.eagle:package:22472/2"/>
+<part name="UART/I2C" library="pinhead" library_urn="urn:adsk.eagle:library:325" deviceset="PINHD-1X6" device="" package3d_urn="urn:adsk.eagle:package:22472/2"/>
 <part name="GND7" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="P+11" library="supply" deviceset="+3V3" device=""/>
 </parts>
@@ -10736,7 +10736,10 @@ In this library the device names are the same as the pin names of the symbols, t
 <instance part="SUPPLY5" gate="G$1" x="53.34" y="68.58" smashed="yes">
 <attribute name="VALUE" x="51.435" y="71.755" size="1.778" layer="96"/>
 </instance>
-<instance part="IC7" gate="G$1" x="259.08" y="200.66"/>
+<instance part="IC7" gate="G$1" x="259.08" y="200.66" smashed="yes">
+<attribute name="NAME" x="285.75" y="208.28" size="1.778" layer="95" align="center-left"/>
+<attribute name="VALUE" x="285.75" y="205.74" size="1.778" layer="96" align="center-left"/>
+</instance>
 <instance part="SUPPLY6" gate="G$1" x="137.16" y="66.04" smashed="yes">
 <attribute name="VALUE" x="135.255" y="69.215" size="1.778" layer="96"/>
 </instance>
@@ -10744,12 +10747,21 @@ In this library the device names are the same as the pin names of the symbols, t
 <attribute name="NAME" x="142.24" y="59.69" size="1.778" layer="95" align="center-left"/>
 <attribute name="VALUE" x="142.24" y="57.15" size="1.778" layer="96" align="center-left"/>
 </instance>
-<instance part="CAN" gate="G$1" x="198.12" y="78.74"/>
-<instance part="VBAT" gate="G$1" x="172.72" y="50.8"/>
+<instance part="CAN" gate="G$1" x="198.12" y="78.74" smashed="yes">
+<attribute name="NAME" x="191.77" y="84.455" size="1.778" layer="95"/>
+<attribute name="VALUE" x="191.77" y="73.66" size="1.778" layer="96"/>
+</instance>
+<instance part="VBAT" gate="G$1" x="172.72" y="50.8" smashed="yes">
+<attribute name="NAME" x="166.37" y="56.515" size="1.778" layer="95"/>
+<attribute name="VALUE" x="166.37" y="45.72" size="1.778" layer="96"/>
+</instance>
 <instance part="GND16" gate="1" x="162.56" y="43.18" smashed="yes">
 <attribute name="VALUE" x="160.02" y="40.64" size="1.778" layer="96"/>
 </instance>
-<instance part="JP1" gate="A" x="256.54" y="43.18"/>
+<instance part="UART/I2C" gate="A" x="256.54" y="43.18" smashed="yes">
+<attribute name="NAME" x="250.19" y="53.975" size="1.778" layer="95"/>
+<attribute name="VALUE" x="250.19" y="33.02" size="1.778" layer="96"/>
+</instance>
 <instance part="GND7" gate="1" x="241.3" y="30.48" smashed="yes">
 <attribute name="VALUE" x="238.76" y="27.94" size="1.778" layer="96"/>
 </instance>
@@ -10964,7 +10976,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <wire x1="162.56" y1="50.8" x2="162.56" y2="45.72" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="JP1" gate="A" pin="6"/>
+<pinref part="UART/I2C" gate="A" pin="6"/>
 <pinref part="GND7" gate="1" pin="GND"/>
 <wire x1="254" y1="38.1" x2="241.3" y2="38.1" width="0.1524" layer="91"/>
 <wire x1="241.3" y1="38.1" x2="241.3" y2="33.02" width="0.1524" layer="91"/>
@@ -11081,7 +11093,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <junction x="261.62" y="309.88"/>
 </segment>
 <segment>
-<pinref part="JP1" gate="A" pin="1"/>
+<pinref part="UART/I2C" gate="A" pin="1"/>
 <wire x1="254" y1="50.8" x2="241.3" y2="50.8" width="0.1524" layer="91"/>
 <pinref part="P+11" gate="G$1" pin="+3V3"/>
 <wire x1="241.3" y1="50.8" x2="241.3" y2="55.88" width="0.1524" layer="91"/>
@@ -11251,52 +11263,16 @@ In this library the device names are the same as the pin names of the symbols, t
 <label x="78.74" y="129.54" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="MTDI" class="0">
-<segment>
-<pinref part="ESP32" gate="G$1" pin="IO41"/>
-<wire x1="121.92" y1="147.32" x2="132.08" y2="147.32" width="0.1524" layer="91"/>
-<label x="124.46" y="147.32" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="MICROSD" gate="G$1" pin="DAT0_DO"/>
-<wire x1="345.44" y1="129.54" x2="335.28" y2="129.54" width="0.1524" layer="91"/>
-<label x="337.82" y="129.54" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="MTDO" class="0">
-<segment>
-<pinref part="ESP32" gate="G$1" pin="IO40"/>
-<wire x1="121.92" y1="149.86" x2="132.08" y2="149.86" width="0.1524" layer="91"/>
-<label x="124.46" y="149.86" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="MICROSD" gate="G$1" pin="CMD_DIN"/>
-<wire x1="345.44" y1="149.86" x2="335.28" y2="149.86" width="0.1524" layer="91"/>
-<label x="337.82" y="149.86" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="MTCK" class="0">
-<segment>
-<pinref part="ESP32" gate="G$1" pin="IO39"/>
-<wire x1="121.92" y1="152.4" x2="132.08" y2="152.4" width="0.1524" layer="91"/>
-<label x="124.46" y="152.4" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="MICROSD" gate="G$1" pin="CLK"/>
-<wire x1="345.44" y1="139.7" x2="335.28" y2="139.7" width="0.1524" layer="91"/>
-<label x="337.82" y="139.7" size="1.778" layer="95"/>
-</segment>
-</net>
 <net name="SDCARD" class="0">
-<segment>
-<pinref part="ESP32" gate="G$1" pin="IO45"/>
-<wire x1="121.92" y1="167.64" x2="134.62" y2="167.64" width="0.1524" layer="91"/>
-<label x="124.46" y="167.64" size="1.778" layer="95"/>
-</segment>
 <segment>
 <pinref part="MICROSD" gate="G$1" pin="CD_DAT3_CS"/>
 <wire x1="345.44" y1="154.94" x2="335.28" y2="154.94" width="0.1524" layer="91"/>
 <label x="337.82" y="154.94" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="ESP32" gate="G$1" pin="IO38"/>
+<wire x1="121.92" y1="154.94" x2="132.08" y2="154.94" width="0.1524" layer="91"/>
+<label x="124.46" y="154.94" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="USBD-" class="0">
@@ -11358,7 +11334,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <label x="124.46" y="142.24" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="JP1" gate="A" pin="4"/>
+<pinref part="UART/I2C" gate="A" pin="4"/>
 <wire x1="254" y1="43.18" x2="241.3" y2="43.18" width="0.1524" layer="91"/>
 <label x="241.3" y="43.18" size="1.778" layer="95"/>
 </segment>
@@ -11370,7 +11346,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <label x="124.46" y="139.7" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="JP1" gate="A" pin="5"/>
+<pinref part="UART/I2C" gate="A" pin="5"/>
 <wire x1="254" y1="40.64" x2="241.3" y2="40.64" width="0.1524" layer="91"/>
 <label x="241.3" y="40.64" size="1.778" layer="95"/>
 </segment>
@@ -11382,9 +11358,9 @@ In this library the device names are the same as the pin names of the symbols, t
 <label x="60.96" y="53.34" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="ESP32" gate="G$1" pin="IO35"/>
-<wire x1="121.92" y1="162.56" x2="132.08" y2="162.56" width="0.1524" layer="91"/>
-<label x="124.46" y="162.56" size="1.778" layer="95"/>
+<pinref part="ESP32" gate="G$1" pin="IO0"/>
+<wire x1="121.92" y1="165.1" x2="132.08" y2="165.1" width="0.1524" layer="91"/>
+<label x="124.46" y="165.1" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="VEXT" class="0">
@@ -11406,6 +11382,16 @@ In this library the device names are the same as the pin names of the symbols, t
 <wire x1="259.08" y1="193.04" x2="248.92" y2="193.04" width="0.1524" layer="91"/>
 <label x="251.46" y="193.04" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="ESP32" gate="G$1" pin="IO5"/>
+<wire x1="88.9" y1="157.48" x2="78.74" y2="157.48" width="0.1524" layer="91"/>
+<label x="81.28" y="157.48" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="ESP32" gate="G$1" pin="IO2"/>
+<wire x1="121.92" y1="137.16" x2="132.08" y2="137.16" width="0.1524" layer="91"/>
+<label x="124.46" y="137.16" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="SDA" class="0">
 <segment>
@@ -11419,9 +11405,14 @@ In this library the device names are the same as the pin names of the symbols, t
 <label x="251.46" y="195.58" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="ESP32" gate="G$1" pin="IO21"/>
-<wire x1="88.9" y1="111.76" x2="78.74" y2="111.76" width="0.1524" layer="91"/>
-<label x="78.74" y="111.76" size="1.778" layer="95"/>
+<pinref part="ESP32" gate="G$1" pin="IO4"/>
+<wire x1="88.9" y1="160.02" x2="78.74" y2="160.02" width="0.1524" layer="91"/>
+<label x="81.28" y="160.02" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="ESP32" gate="G$1" pin="IO1"/>
+<wire x1="121.92" y1="134.62" x2="132.08" y2="134.62" width="0.1524" layer="91"/>
+<label x="124.46" y="134.62" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="VBAT" class="0">
@@ -11499,7 +11490,7 @@ In this library the device names are the same as the pin names of the symbols, t
 <label x="292.1" y="195.58" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="JP1" gate="A" pin="2"/>
+<pinref part="UART/I2C" gate="A" pin="2"/>
 <wire x1="254" y1="48.26" x2="241.3" y2="48.26" width="0.1524" layer="91"/>
 <label x="241.3" y="48.26" size="1.778" layer="95"/>
 </segment>
@@ -11511,9 +11502,45 @@ In this library the device names are the same as the pin names of the symbols, t
 <label x="292.1" y="193.04" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="JP1" gate="A" pin="3"/>
+<pinref part="UART/I2C" gate="A" pin="3"/>
 <wire x1="254" y1="45.72" x2="241.3" y2="45.72" width="0.1524" layer="91"/>
 <label x="241.3" y="45.72" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="MISO" class="0">
+<segment>
+<pinref part="ESP32" gate="G$1" pin="IO37"/>
+<wire x1="121.92" y1="157.48" x2="132.08" y2="157.48" width="0.1524" layer="91"/>
+<label x="124.46" y="157.48" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="MICROSD" gate="G$1" pin="DAT0_DO"/>
+<wire x1="345.44" y1="129.54" x2="335.28" y2="129.54" width="0.1524" layer="91"/>
+<label x="337.82" y="129.54" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="SCK" class="0">
+<segment>
+<pinref part="ESP32" gate="G$1" pin="IO36"/>
+<wire x1="121.92" y1="160.02" x2="132.08" y2="160.02" width="0.1524" layer="91"/>
+<label x="124.46" y="160.02" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="MICROSD" gate="G$1" pin="CLK"/>
+<wire x1="345.44" y1="139.7" x2="335.28" y2="139.7" width="0.1524" layer="91"/>
+<label x="337.82" y="139.7" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="MOSI" class="0">
+<segment>
+<pinref part="ESP32" gate="G$1" pin="IO35"/>
+<wire x1="121.92" y1="162.56" x2="132.08" y2="162.56" width="0.1524" layer="91"/>
+<label x="124.46" y="162.56" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="MICROSD" gate="G$1" pin="CMD_DIN"/>
+<wire x1="345.44" y1="149.86" x2="335.28" y2="149.86" width="0.1524" layer="91"/>
+<label x="337.82" y="149.86" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
