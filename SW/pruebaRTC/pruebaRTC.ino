@@ -4,10 +4,12 @@
 RTC_DS3231 rtc;
 
 char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+#define I2C_SDA 1
+#define I2C_SCL 2
 
 void setup () {
-  Serial.begin(57600);
-
+  Serial.begin(115200);
+  Wire.begin(I2C_SDA, I2C_SCL);
 #ifndef ESP8266
   while (!Serial); // wait for serial port to connect. Needed for native USB
 #endif
