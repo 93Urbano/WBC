@@ -1,47 +1,52 @@
+#include "driver/gpio.h"
 #include "driver/twai.h"
 
+void setup()
+{
+    //Initialize configuration structures using macro initializers
+    twai_general_config_t g_config = TWAI_GENERAL_CONFIG_DEFAULT(GPIO_NUM_46, GPIO_NUM_3, TWAI_MODE_NORMAL);
+    twai_timing_config_t t_config = TWAI_TIMING_CONFIG_100KBITS();
+    twai_filter_config_t f_config = TWAI_FILTER_CONFIG_ACCEPT_ALL();
 
-#define RX_PIN        3
-#define TX_PIN        46
-#define CAN_RS        38
+    //Install TWAI driver
+    if (twai_driver_install(&g_config, &t_config, &f_config) == ESP_OK) {
+        printf("Driver installed\n");
+    } else {
+        printf("Failed to install driver\n");
+        return;
+    }
 
+    //Start TWAI driver
+    if (twai_start() == ESP_OK) {
+        printf("Driver started\n");
+    } else {
+        printf("Failed to start driver\n");
+        return;
+    }
 
-
-void setup() {
-  Serial.begin(115200);
-//  Serial.setTxTimeoutMs(0);   // prevent slow timeouts
-  pinMode(CAN_RS, OUTPUT);    // INPUT (high impedance) = slope control mode, OUTPUT = see next line
-  digitalWrite(CAN_RS, LOW);  // LOW = high speed mode, HIGH = low power mode (listen only)
-  twai_general_config_t g_config = TWAI_GENERAL_CONFIG_DEFAULT((gpio_num_t)TX_PIN, (gpio_num_t)RX_PIN, TWAI_MODE_LISTEN_ONLY);  // TWAI_MODE_NORMAL, TWAI_MODE_NO_ACK or TWAI_MODE_LISTEN_ONLY
-  twai_timing_config_t t_config  = TWAI_TIMING_CONFIG_500KBITS();
-  twai_filter_config_t f_config  = TWAI_FILTER_CONFIG_ACCEPT_ALL();
-  twai_driver_install(&g_config, &t_config, &f_config);
-  twai_start();
 }
 
+void loop ()
+{
+//Wait for message to be received
+twai_message_t message;
+if (twai_receive(&message, pdMS_TO_TICKS(100)) == ESP_OK) {
+    printf("Message received\n");
+} else {
+    printf("Failed to receive message\n");
+    return;
+}
 
-void loop() {
-  twai_message_t message;
-  
-  if (twai_receive(&message, 0) == ESP_OK) {
-    Serial.print("0x");
-    Serial.print(message.identifier, HEX);
-    Serial.print("\t");
-    Serial.print(message.extd);
-    Serial.print("\t");
-    Serial.print(message.rtr);
-    Serial.print("\t");
-    Serial.print(message.data_length_code);
-    
-    for(int i=0;i<message.data_length_code;i++) {
-      Serial.print("\t0x");
-      if (message.data[i]<=0x0F) {
-        Serial.print(0);
-      }
-      Serial.print(message.data[i], HEX);
+//Process received message
+if (message.extd) {
+    printf("Message is in Extended Format\n");
+} else {
+    printf("Message is in Standard Format\n");
+}
+printf("ID is %d\n", message.identifier);
+if (!(message.rtr)) {
+    for (int i = 0; i < message.data_length_code; i++) {
+        printf("Data byte %d = %d\n", i, message.data[i]);
     }
-    Serial.println();
-  }
-  Serial.println("Reading....");
-  delay(1000);
+}
 }
