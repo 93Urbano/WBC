@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="5" unitdist="mil" unit="mil" style="lines" multiple="1" display="yes" altdistance="5" altunitdist="mil" altunit="mil"/>
+<grid distance="25" unitdist="mil" unit="mil" style="lines" multiple="1" display="yes" altdistance="5" altunitdist="mil" altunit="mil"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
@@ -310,7 +310,7 @@
 <pad name="11" x="22" y="10" drill="1.9" diameter="2.1844" shape="long" rot="R90"/>
 <pad name="10" x="26" y="10" drill="1.9" diameter="2.1844" shape="long" rot="R90"/>
 <pad name="9" x="30" y="10" drill="1.9" diameter="2.1844" shape="long" rot="R90"/>
-<pad name="8" x="2" y="19" drill="1.9" diameter="2.1844" shape="long" rot="R90"/>
+<pad name="8" x="2" y="19" drill="1.9" diameter="1.778" shape="long" rot="R90"/>
 <pad name="7" x="6" y="19" drill="1.9" diameter="2.1844" shape="long" rot="R90"/>
 <pad name="6" x="10" y="19" drill="1.9" diameter="2.1844" shape="long" rot="R90"/>
 <pad name="5" x="14" y="19" drill="1.9" diameter="2.1844" shape="long" rot="R90"/>
@@ -327,22 +327,22 @@
 <wire x1="-3" y1="6" x2="35" y2="6" width="0.127" layer="22"/>
 <wire x1="35" y1="6" x2="35" y2="23" width="0.127" layer="22"/>
 <wire x1="35" y1="23" x2="-3" y2="23" width="0.127" layer="22"/>
-<text x="30.5" y="15" size="1.27" layer="22" rot="MR0">1</text>
-<text x="26.5" y="15" size="1.27" layer="22" rot="MR0">2</text>
-<text x="22.5" y="15" size="1.27" layer="22" rot="MR0">3</text>
-<text x="18.5" y="15" size="1.27" layer="22" rot="MR0">4</text>
-<text x="14.5" y="15" size="1.27" layer="22" rot="MR0">5</text>
-<text x="10.5" y="15" size="1.27" layer="22" rot="MR0">6</text>
-<text x="6.5" y="15" size="1.27" layer="22" rot="MR0">7</text>
-<text x="2.5" y="15" size="1.27" layer="22" rot="MR0">8</text>
-<text x="30.5" y="12.5" size="1.27" layer="22" rot="MR0">9</text>
-<text x="27" y="12.5" size="1.27" layer="22" rot="MR0">10</text>
-<text x="23" y="12.5" size="1.27" layer="22" rot="MR0">11</text>
-<text x="19" y="12.5" size="1.27" layer="22" rot="MR0">12</text>
-<text x="15" y="12.5" size="1.27" layer="22" rot="MR0">13</text>
-<text x="11" y="12.5" size="1.27" layer="22" rot="MR0">14</text>
-<text x="7" y="12.5" size="1.27" layer="22" rot="MR0">15</text>
-<text x="3" y="12.5" size="1.27" layer="22" rot="MR0">16</text>
+<text x="30.25" y="15" size="0.762" layer="22" rot="MR0">1</text>
+<text x="26.25" y="15" size="0.762" layer="22" rot="MR0">2</text>
+<text x="22.25" y="15" size="0.762" layer="22" rot="MR0">3</text>
+<text x="18.5" y="15" size="0.762" layer="22" rot="MR0">4</text>
+<text x="14.25" y="15" size="0.762" layer="22" rot="MR0">5</text>
+<text x="10.25" y="15" size="0.762" layer="22" rot="MR0">6</text>
+<text x="6.25" y="15" size="0.762" layer="22" rot="MR0">7</text>
+<text x="2.25" y="15" size="0.762" layer="22" rot="MR0">8</text>
+<text x="30.25" y="13.25" size="0.762" layer="22" rot="MR0">9</text>
+<text x="26.5" y="13.25" size="0.762" layer="22" rot="MR0">10</text>
+<text x="22.5" y="13.25" size="0.762" layer="22" rot="MR0">11</text>
+<text x="18.5" y="13.25" size="0.762" layer="22" rot="MR0">12</text>
+<text x="14.5" y="13.25" size="0.762" layer="22" rot="MR0">13</text>
+<text x="10.5" y="13.25" size="0.762" layer="22" rot="MR0">14</text>
+<text x="6.5" y="13.25" size="0.762" layer="22" rot="MR0">15</text>
+<text x="2.5" y="13.25" size="0.762" layer="22" rot="MR0">16</text>
 </package>
 </packages>
 </library>
@@ -544,29 +544,33 @@ Please make sure your boards conform to these design rules.
 <attribute name="POPULARITY" value="79" x="28.448" y="28.575" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="25.273" y="36.195" size="1.27" layer="27" rot="R270"/>
 </element>
-<element name="OBD2" library="OBD2" package="OBD2" value="OBD2" x="3.556" y="-25.908" smashed="yes">
-<attribute name="NAME" x="0.556" y="-1.908" size="1.27" layer="21"/>
+<element name="OBD2" library="OBD2" package="OBD2" value="OBD2" x="29.464" y="16.129" smashed="yes" rot="R90">
+<attribute name="NAME" x="5.464" y="13.129" size="1.27" layer="21" rot="R90"/>
 </element>
 </elements>
 <signals>
 <signal name="GND">
 <polygon width="0.1524" layer="1" spacing="0.254" isolate="0.254">
-<vertex x="0" y="56.388"/>
-<vertex x="30.988" y="56.388"/>
-<vertex x="30.988" y="0"/>
-<vertex x="0" y="0"/>
-</polygon>
-<polygon width="0.1524" layer="16" spacing="0.254" isolate="0.254">
-<vertex x="0" y="56.388"/>
-<vertex x="30.988" y="56.388"/>
+<vertex x="0" y="64.388"/>
+<vertex x="30.988" y="64.388"/>
 <vertex x="30.988" y="0"/>
 <vertex x="0" y="0"/>
 </polygon>
 <contactref element="VBAT" pad="2"/>
 <contactref element="UART/I2C" pad="6"/>
 <contactref element="OBD2" pad="5"/>
-<wire x1="28.448" y1="11.303" x2="28.448" y2="22.225" width="0" layer="19" extent="1-1"/>
-<wire x1="17.556" y1="-6.908" x2="28.448" y2="11.303" width="0" layer="19" extent="1-1"/>
+<contactref element="OBD2" pad="13"/>
+<wire x1="19.464" y1="30.129" x2="21.941" y2="30.129" width="1.016" layer="16"/>
+<wire x1="21.941" y1="30.129" x2="26.035" y2="26.035" width="1.016" layer="16"/>
+<wire x1="26.035" y1="26.035" x2="26.035" y2="23.495" width="1.016" layer="16"/>
+<wire x1="26.035" y1="23.495" x2="27.305" y2="22.225" width="1.016" layer="16"/>
+<wire x1="27.305" y1="22.225" x2="28.448" y2="22.225" width="1.016" layer="16"/>
+<wire x1="10.464" y1="30.129" x2="6.634" y2="30.129" width="1.016" layer="16"/>
+<wire x1="6.634" y1="30.129" x2="5.08" y2="28.575" width="1.016" layer="16"/>
+<wire x1="5.08" y1="28.575" x2="5.08" y2="13.335" width="1.016" layer="16"/>
+<wire x1="7.112" y1="11.303" x2="28.448" y2="11.303" width="1.016" layer="16"/>
+<wire x1="5.08" y1="13.335" x2="7.112" y2="11.303" width="1.016" layer="16"/>
+<wire x1="10.464" y1="30.129" x2="19.464" y2="30.129" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="+3V3">
 <contactref element="UART/I2C" pad="1"/>
@@ -574,12 +578,20 @@ Please make sure your boards conform to these design rules.
 <signal name="CANL">
 <contactref element="CAN" pad="2"/>
 <contactref element="OBD2" pad="14"/>
-<wire x1="13.556" y1="-15.908" x2="28.448" y2="18.034" width="0" layer="19" extent="1-1"/>
+<wire x1="19.464" y1="26.129" x2="22.766" y2="26.129" width="0.6096" layer="16"/>
+<wire x1="22.766" y1="26.129" x2="24.765" y2="24.13" width="0.6096" layer="16"/>
+<wire x1="24.765" y1="24.13" x2="24.765" y2="19.05" width="0.6096" layer="16"/>
+<wire x1="24.765" y1="19.05" x2="25.781" y2="18.034" width="0.6096" layer="16"/>
+<wire x1="25.781" y1="18.034" x2="28.448" y2="18.034" width="0.6096" layer="16"/>
 </signal>
 <signal name="CANH">
 <contactref element="CAN" pad="1"/>
 <contactref element="OBD2" pad="6"/>
-<wire x1="13.556" y1="-6.908" x2="28.448" y2="15.494" width="0" layer="19" extent="1-1"/>
+<wire x1="10.464" y1="26.129" x2="13.876" y2="26.129" width="0.6096" layer="16"/>
+<wire x1="15.24" y1="24.765" x2="15.24" y2="17.145" width="0.6096" layer="16"/>
+<wire x1="16.891" y1="15.494" x2="28.448" y2="15.494" width="0.6096" layer="16"/>
+<wire x1="13.876" y1="26.129" x2="15.24" y2="24.765" width="0.6096" layer="16"/>
+<wire x1="15.24" y1="17.145" x2="16.891" y2="15.494" width="0.6096" layer="16"/>
 </signal>
 <signal name="RX">
 <contactref element="UART/I2C" pad="4"/>
@@ -590,7 +602,9 @@ Please make sure your boards conform to these design rules.
 <signal name="VEXT">
 <contactref element="VBAT" pad="1"/>
 <contactref element="OBD2" pad="16"/>
-<wire x1="5.556" y1="-15.908" x2="28.448" y2="8.763" width="0" layer="19" extent="1-1"/>
+<wire x1="19.464" y1="18.129" x2="19.464" y2="12.286" width="1.016" layer="1"/>
+<wire x1="22.987" y1="8.763" x2="28.448" y2="8.763" width="1.016" layer="1"/>
+<wire x1="19.464" y1="12.286" x2="22.987" y2="8.763" width="1.016" layer="1"/>
 </signal>
 <signal name="SDA2">
 <contactref element="UART/I2C" pad="2"/>
@@ -600,6 +614,12 @@ Please make sure your boards conform to these design rules.
 </signal>
 <signal name="CHASIS">
 <contactref element="OBD2" pad="4"/>
+<polygon width="0.1524" layer="16" spacing="0.254" isolate="0.254">
+<vertex x="0" y="64.388"/>
+<vertex x="30.988" y="64.388"/>
+<vertex x="30.988" y="0"/>
+<vertex x="0" y="0"/>
+</polygon>
 </signal>
 </signals>
 <mfgpreviewcolors>

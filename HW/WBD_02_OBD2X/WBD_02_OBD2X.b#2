@@ -570,7 +570,6 @@ Please make sure your boards conform to these design rules.
 <wire x1="5.08" y1="28.575" x2="5.08" y2="13.335" width="1.016" layer="16"/>
 <wire x1="7.112" y1="11.303" x2="28.448" y2="11.303" width="1.016" layer="16"/>
 <wire x1="5.08" y1="13.335" x2="7.112" y2="11.303" width="1.016" layer="16"/>
-<wire x1="10.464" y1="30.129" x2="19.464" y2="30.129" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="+3V3">
 <contactref element="UART/I2C" pad="1"/>
@@ -579,10 +578,10 @@ Please make sure your boards conform to these design rules.
 <contactref element="CAN" pad="2"/>
 <contactref element="OBD2" pad="14"/>
 <wire x1="19.464" y1="26.129" x2="22.766" y2="26.129" width="0.6096" layer="16"/>
-<wire x1="22.766" y1="26.129" x2="24.765" y2="24.13" width="0.6096" layer="16"/>
-<wire x1="24.765" y1="24.13" x2="24.765" y2="19.05" width="0.6096" layer="16"/>
-<wire x1="24.765" y1="19.05" x2="25.781" y2="18.034" width="0.6096" layer="16"/>
 <wire x1="25.781" y1="18.034" x2="28.448" y2="18.034" width="0.6096" layer="16"/>
+<wire x1="22.766" y1="26.129" x2="24.13" y2="24.765" width="0.6096" layer="16"/>
+<wire x1="24.13" y1="19.685" x2="25.781" y2="18.034" width="0.6096" layer="16"/>
+<wire x1="24.13" y1="24.765" x2="24.13" y2="19.685" width="0.6096" layer="16"/>
 </signal>
 <signal name="CANH">
 <contactref element="CAN" pad="1"/>
@@ -629,14 +628,6 @@ Please make sure your boards conform to these design rules.
 <mfgpreviewcolor name="coppercolor" color="0xFFFFBF00"/>
 <mfgpreviewcolor name="substratecolor" color="0xFF786E46"/>
 </mfgpreviewcolors>
-<errors>
-<approved hash="7,39,d1ef993cc9c4e4ef"/>
-<approved hash="7,39,1000103a42c242f8"/>
-<approved hash="7,39,766e38bc8d04d8ae"/>
-<approved hash="7,39,10066ffa3d0242fe"/>
-<approved hash="7,39,c44fe56b36bd0ce1"/>
-<approved hash="7,39,7bcf856b6a7cf120"/>
-</errors>
 </board>
 </drawing>
 <compatibility>
