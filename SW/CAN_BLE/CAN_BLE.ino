@@ -153,7 +153,6 @@ void loop ()
   
     if (deviceConnected) 
     {
-        //WriteString2BLE("PEPE EL DE LOS PALOTES\n");
         WriteString2BLE("\n");
         std::sprintf(buffer, "Rx 2 0x%X ", message.identifier);
         std::string formattedString(buffer);
