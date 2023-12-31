@@ -11,7 +11,16 @@ int tpsPercentage = 0;
 int brakePercentage = 0;
 int ClutchState = 0;
 int ledPin = 0;
-int CANfrequency = 0;
+uint CANfrequency = 1000000;
+bool CANactive = 0;
+uint UARTBauds = 115200;
+bool UARTactive = 0;
+bool CANShow = 0;
+bool UARTShow = 0;
+bool RTCShow = 0;
+bool CANSave = 0;
+bool UARTSave = 0;
+bool RTCSave = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -29,6 +38,10 @@ void setup() {
   server.on("/data", HTTP_GET, handleData);
   server.on("/control", HTTP_POST, handleControl);
   server.on("/cancontrol", HTTP_POST, handleCANControl);
+  server.on("/uartcontrol", HTTP_POST, handleUARTControl);
+  server.on("/btconfig", HTTP_POST, handleBTControl);
+  server.on("/dataconfig", HTTP_POST, handleDATAControl);
+  server.on("/datetimeconfig", HTTP_POST, handleDATETIME);
   server.on("/Data Log", HTTP_GET, handleDataLog);
   server.on("/Configuration", HTTP_GET, handleConfig);
 
@@ -41,11 +54,12 @@ void loop() {
   tpsPercentage += 5;
   brakePercentage += 5;
   ClutchState +=1;
+  if (CANSave == 1) digitalWrite(ledPin, HIGH);
 }
 
 void handleRoot(AsyncWebServerRequest *request) {
-  String html = "<html><head><title>Pestañas</title></head><body>";
-  html += "<h1>ESP32 UCW</h1>";
+  String html = "<html><head><title>ESP32 WBC</title></head><body>";
+  html += "<h1>ESP32 WBC</h1>";
   html += "<ul>";
   html += "<li><a href='/Configuration'>Configuration</a></li>";
   html += "<li><a href='/Data Log'>Data Log</a></li>";
@@ -55,8 +69,8 @@ void handleRoot(AsyncWebServerRequest *request) {
 }
 
 void handleDataLog(AsyncWebServerRequest *request) {
-  String html = "<html><head><title>Configuración General</title></head><body>";
-  html += "<h1>ESP32 UCW - Datalogger</h1>";
+  String html = "<html><head><title>WBC Datalogger</title></head><body>";
+  html += "<h1>ESP32 WBC - Datalogger</h1>";
   html += "<form id='controlForm'>";
   html += "<label for='ledControl'>LED Control:</label>";
   html += "<select id='ledControl' name='ledControl'>";
@@ -103,8 +117,8 @@ void handleDataLog(AsyncWebServerRequest *request) {
 }
 
 void handleConfig(AsyncWebServerRequest *request) {
-  String html = "<html><head><title>UCW Configuration</title></head><body>";
-  html += "<h1>ESP32 UCW - Configuration</h1>";
+  String html = "<html><head><title>WBC Configuration</title></head><body>";
+  html += "<h1>ESP32 WBC - Configuration</h1>";
   html += "<p><strong>CAN configuration:</strong></p>";
   html += "<form id=\"canFrequencyForm\">";
   html += "<label for=\"canFrequencyControl\">CAN Frequency:</label>";
@@ -114,16 +128,11 @@ void handleConfig(AsyncWebServerRequest *request) {
   html += "</select>";
   html += "<p><label><input id=\"enableCAN\" name=\"canOption\" type=\"radio\" value=\'enable' onclick=\"toggleRadio('enableCAN', 'disableCAN')\" /> Enable CAN </label></p>";
   html += "<p><label><input id=\"disableCAN\" name=\"canOption\" type=\"radio\" value=\'disable' onclick=\"toggleRadio('disableCAN', 'enableCAN')\" /> Disable CAN </label></p>";
-  //html += "<p><button type=\"button\">Send CAN config</button></p>";
   html += "<p><button type='button' onclick='SendCANconfig()'>Send CAN config</button>";
   html += "</form>";
 
   html += "<form>";
   html += "<p><strong>UART configuration:</strong></p>";
-  html += "<p><label><input id=\"enableUART\" name=\"uartOption\" type=\"radio\" value=\"enable\" onclick=\"toggleRadio('enableUART', 'disableUART')\" /> Enable UART </label></p>";
-  html += "<p><label><input id=\"disableUART\" name=\"uartOption\" type=\"radio\" value=\"disable\" onclick=\"toggleRadio('disableUART', 'enableUART')\" /> Disable UART </label></p>";
-  html += "</form>";
-
   html += "<form id=\"uartBaudsForm\">";
   html += "<label for=\"uartBaudsControl\">UART Bauds:</label>";
   html += "<select id=\"uartBaudsControl\" name=\"uartBaudsControl\">";
@@ -133,25 +142,28 @@ void handleConfig(AsyncWebServerRequest *request) {
   html += "<option value=\"57600\">57600</option>";
   html += "<option value=\"115200\">115200</option>";
   html += "</select>";
-  html += "<p><button type=\"button\">Send UART config</button></p>";
+  html += "<p><label><input id=\"enableUART\" name=\"uartOption\" type=\"radio\" value=\'enable' onclick=\"toggleRadio('enableUART', 'disableUART')\" /> Enable UART </label></p>";
+  html += "<p><label><input id=\"disableUART\" name=\"uartOption\" type=\"radio\" value=\'disable' onclick=\"toggleRadio('disableUART', 'enableUART')\" /> Disable UART </label></p>";
+  html += "<p><button type='button' onclick='SendUARTconfig()'>Send UART config</button>";
   html += "</form>";
 
   html += "<p><strong>BT configuration:</strong></p>";
-  html += "<p><label><input name=\"showCAN\" type=\"radio\" value=\"yes\" /> Show CAN </label></p>";
-  html += "<p><label><input name=\"showUART\" type=\"radio\" value=\"yes\" /> Show UART </label></p>";
-  html += "<p><label><input name=\"showRTC\" type=\"radio\" value=\"yes\" /> Show RTC </label></p>";
-  html += "<p><button type=\"button\">Send BT config</button></p>";
+  html += "<p><label><input name=\"showCAN\" type=\"radio\" value=\'yes' /> Show CAN </label></p>";
+  html += "<p><label><input name=\"showUART\" type=\"radio\" value=\'yes' /> Show UART </label></p>";
+  html += "<p><label><input name=\"showRTC\" type=\"radio\" value=\'yes' /> Show RTC </label></p>";
+  html += "<p><button type='button' onclick='SendBTconfig()'>Send BT config</button>";
 
   html += "<p><strong>Datalogger:</strong></p>";
   html += "<p><label><input name=\"saveCAN\" type=\"radio\" value=\"yes\" /> Save CAN </label></p>";
   html += "<p><label><input name=\"saveUART\" type=\"radio\" value=\"yes\" /> Save UART </label></p>";
   html += "<p><label><input name=\"saveRTC\" type=\"radio\" value=\"yes\" /> Save RTC </label></p>";
-  html += "<p><button type=\"button\">Send Datalogger config</button></p>";
+  html += "<p><button type='button' onclick='SendDATAconfig()'>Send Datalogger config</button>";
 
   html += "<p><strong>RTC configuration:</strong></p>";
   html += "<label for=\"fechaHora\">Select Date &amp; Time:</label>";
   html += "<input id=\"fechaHora\" name=\"fechaHora\" type=\"datetime-local\" />";
-  html += "<p><button type=\"button\">Send Date &amp; Time</button></p>";
+  html += "<p><button type='button' onclick='SendDATETIME()'>Send Date &amp; Time</button>";
+  
 
   html += "<script>";
   html += "function toggleRadio(checkedId, uncheckedId) {";
@@ -168,8 +180,49 @@ void handleConfig(AsyncWebServerRequest *request) {
   html += "  xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');";
   html += "  xhttp.send('canFrequencyControl=' + canFrequencyControl + '&canOption=' + canOptionValue);"; // Enviar también el valor del botón de radio
   html += "}";
+  html += "function SendUARTconfig() {";
+  html += "  var uartBaudsControl = document.getElementById('uartBaudsControl').value;";
+  html += "  var uartOption = document.querySelector('input[name=\"uartOption\"]:checked');";
+  html += "  var uartOptionValue = uartOption ? uartOption.value : '';"; // Obtener el valor del botón de radio seleccionado
+  html += "  var xhttp = new XMLHttpRequest();";
+  html += "  xhttp.open('POST', '/uartcontrol', true);";
+  html += "  xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');";
+  html += "  xhttp.send('uartBaudsControl=' + uartBaudsControl + '&uartOption=' + uartOptionValue);"; // Enviar también el valor del botón de radio
+  html += "}";
+  html += "function SendBTconfig() {";
+  html += "  var showCAN = document.querySelector('input[name=\"showCAN\"]:checked');";
+  html += "  var showUART = document.querySelector('input[name=\"showUART\"]:checked');";
+  html += "  var showRTC = document.querySelector('input[name=\"showRTC\"]:checked');";
+  html += "  var showCANValue = showCAN ? showCAN.value : '';";
+  html += "  var showUARTValue = showUART ? showUART.value : '';";
+  html += "  var showRTCValue = showRTC ? showRTC.value : '';";
+  html += "  var xhttp = new XMLHttpRequest();";
+  html += "  xhttp.open('POST', '/btconfig', true);";
+  html += "  xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');";
+  html += "  xhttp.send('showCAN=' + showCANValue + '&showUART=' + showUARTValue + '&showRTC=' + showRTCValue);";
+  html += "}";
+  html += "function SendDATAconfig() {";
+  html += "  var saveCAN = document.querySelector('input[name=\"saveCAN\"]:checked');";
+  html += "  var saveUART = document.querySelector('input[name=\"saveUART\"]:checked');";
+  html += "  var saveRTC = document.querySelector('input[name=\"saveRTC\"]:checked');";
+  html += "  var saveCANValue = saveCAN ? saveCAN.value : '';";
+  html += "  var saveUARTValue = saveUART ? saveUART.value : '';";
+  html += "  var saveRTCValue = saveRTC ? saveRTC.value : '';";
+  html += "  var xhttp = new XMLHttpRequest();";
+  html += "  xhttp.open('POST', '/dataconfig', true);";
+  html += "  xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');";
+  html += "  xhttp.send('saveCAN=' + saveCANValue + '&saveUART=' + saveUARTValue + '&saveRTC=' + saveRTCValue);";
+  html += "}";
+  html += "function SendDATETIME() {";
+  html += "  var fechaHora = document.getElementById('fechaHora').value;";
+  html += "  var xhttp = new XMLHttpRequest();";
+  html += "  xhttp.open('POST', '/datetimeconfig', true);";
+  html += "  xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');";
+  html += "  xhttp.send('fechaHora=' + fechaHora);";
+  html += "}";
   html += "</script>";
   html += "</body></html>";
+
   request->send(200, "text/html", html);
 }
 
@@ -204,18 +257,74 @@ void handleCANControl(AsyncWebServerRequest *request) {
       //digitalWrite(ledPin, LOW);
       CANfrequency = 100000;
     }
-    request->send(200, "text/plain", "LED controlado: " + canFrequencyControl);
+    request->send(200, "text/plain", "canFrequencyControl: " + canFrequencyControl);
   }
   if (request->hasParam("canOption", true)) {
     String canOption = request->getParam("canOption", true)->value();
     if (canOption == "enable") {
-      digitalWrite(ledPin, HIGH);
+      CANactive = 1;
     } else if (canOption == "disable") {
-      digitalWrite(ledPin, LOW);
+      CANactive = 0;
     }
-    request->send(200, "text/plain", "LED controlado: " + canOption);
+    request->send(200, "text/plain", "canOption: " + canOption);
   }
   else {
     request->send(400, "text/plain", "Invalid Request");
   }
+}
+
+void handleUARTControl(AsyncWebServerRequest *request) {
+  if (request->hasParam("uartBaudsControl", true)) {
+    String uartBaudsControl = request->getParam("uartBaudsControl", true)->value();
+    if (uartBaudsControl == "1M") {
+      //digitalWrite(ledPin, HIGH);
+      UARTBauds = 1000000;
+    } else if (uartBaudsControl == "100K") {
+      //digitalWrite(ledPin, LOW);
+      UARTBauds = 100000;
+    }
+    request->send(200, "text/plain", "uartBaudsControl: " + uartBaudsControl);
+  }
+  if (request->hasParam("uartOption", true)) {
+    String uartOption = request->getParam("uartOption", true)->value();
+    if (uartOption == "enable") {
+      UARTactive = 1;
+    } else if (uartOption == "disable") {
+      UARTactive = 0;
+    }
+    request->send(200, "text/plain", "uartOption: " + uartOption);
+  }
+  else {
+    request->send(400, "text/plain", "Invalid Request");
+  }
+}
+
+void handleBTControl(AsyncWebServerRequest *request) {
+  String showCAN = request->getParam("showCAN", true)->value();
+  String showUART = request->getParam("showUART", true)->value();
+  String showRTC = request->getParam("showRTC", true)->value();
+  if (showCAN == "yes") CANShow = 1;
+  else  CANShow = 0;
+  if (showUART == "yes") UARTShow = 1;
+  else  UARTShow = 0;
+  if (showRTC == "yes") RTCShow = 1;
+  else  RTCShow = 0;
+}
+
+void handleDATAControl(AsyncWebServerRequest *request) {
+  String saveCAN = request->getParam("saveCAN", true)->value();
+  String saveUART = request->getParam("saveUART", true)->value();
+  String saveRTC = request->getParam("saveRTC", true)->value();
+  if (saveCAN == "yes") CANSave = 1;
+  else  CANSave = 0;
+  if (saveUART == "yes") UARTSave = 1;
+  else  UARTSave = 0;
+  if (saveRTC == "yes") RTCSave = 1;
+  else  RTCSave = 0;
+}
+
+void handleDATETIME(AsyncWebServerRequest *request) {
+  String datetime = request->getParam("fechaHora", true)->value();
+  Serial.print("Fecha y hora seleccionada: ");
+  Serial.println(datetime);
 }
