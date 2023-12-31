@@ -118,16 +118,6 @@ void handleConfig(AsyncWebServerRequest *request) {
   html += "<p><button type='button' onclick='SendCANconfig()'>Send CAN config</button>";
   html += "</form>";
 
-  html += "<form id='controlForm'>";
-  html += "<label for='ledControl'>LED Control:</label>";
-  html += "<select id='ledControl' name='ledControl'>";
-  html += "<option value='on'>LED ON</option>";
-  html += "<option value='off'>LED OFF</option>";
-  html += "</select>";
-  html += "<br><br>";
-  html += "<button type='button' onclick='sendLEDCommand()'>Send LED command</button>";
-  html += "</form>";
-
   html += "<form>";
   html += "<p><strong>UART configuration:</strong></p>";
   html += "<p><label><input id=\"enableUART\" name=\"uartOption\" type=\"radio\" value=\"enable\" onclick=\"toggleRadio('enableUART', 'disableUART')\" /> Enable UART </label></p>";
@@ -171,17 +161,12 @@ void handleConfig(AsyncWebServerRequest *request) {
   html += "}";
   html += "function SendCANconfig() {";
   html += "  var canFrequencyControl = document.getElementById('canFrequencyControl').value;";
+  html += "  var canOption = document.querySelector('input[name=\"canOption\"]:checked');";
+  html += "  var canOptionValue = canOption ? canOption.value : '';"; // Obtener el valor del botón de radio seleccionado
   html += "  var xhttp = new XMLHttpRequest();";
   html += "  xhttp.open('POST', '/cancontrol', true);";
   html += "  xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');";
-  html += "  xhttp.send('canFrequencyControl=' + canFrequencyControl);";
-  html += "}";
-  html += "function sendLEDCommand() {";
-  html += "  var ledControl = document.getElementById('ledControl').value;";
-  html += "  var xhttp = new XMLHttpRequest();";
-  html += "  xhttp.open('POST', '/control', true);";
-  html += "  xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');";
-  html += "  xhttp.send('ledControl=' + ledControl);";
+  html += "  xhttp.send('canFrequencyControl=' + canFrequencyControl + '&canOption=' + canOptionValue);"; // Enviar también el valor del botón de radio
   html += "}";
   html += "</script>";
   html += "</body></html>";
@@ -213,14 +198,24 @@ void handleCANControl(AsyncWebServerRequest *request) {
   if (request->hasParam("canFrequencyControl", true)) {
     String canFrequencyControl = request->getParam("canFrequencyControl", true)->value();
     if (canFrequencyControl == "1M") {
-      digitalWrite(ledPin, HIGH);
+      //digitalWrite(ledPin, HIGH);
       CANfrequency = 1000000;
     } else if (canFrequencyControl == "100K") {
-      digitalWrite(ledPin, LOW);
+      //digitalWrite(ledPin, LOW);
       CANfrequency = 100000;
     }
     request->send(200, "text/plain", "LED controlado: " + canFrequencyControl);
-  } else {
+  }
+  if (request->hasParam("canOption", true)) {
+    String canOption = request->getParam("canOption", true)->value();
+    if (canOption == "enable") {
+      digitalWrite(ledPin, HIGH);
+    } else if (canOption == "disable") {
+      digitalWrite(ledPin, LOW);
+    }
+    request->send(200, "text/plain", "LED controlado: " + canOption);
+  }
+  else {
     request->send(400, "text/plain", "Invalid Request");
   }
 }
