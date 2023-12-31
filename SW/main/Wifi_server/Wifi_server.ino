@@ -1,11 +1,8 @@
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 
-//const char* ssid     = "Galaxy S20+b24a";
-//const char* password = "davidjimenez";
-
-const char* ssid     = "vodafone1B2C";
-const char* password = "jimenezurbano";
+const char* ssid     = "Galaxy S20+b24a";
+const char* password = "davidjimenez";
 
 AsyncWebServer server(80);
 
@@ -31,9 +28,9 @@ void setup() {
   server.on("/", HTTP_GET, handleRoot);
   server.on("/data", HTTP_GET, handleData);
   server.on("/control", HTTP_POST, handleControl);
-  server.on("/canControl", HTTP_POST, handleCANControl);
+  server.on("/CANcontrol", HTTP_POST, handleCANControl);
   server.on("/Data Log", HTTP_GET, handleDataLog);
-  server.on("/Config", HTTP_GET, handleConfig);
+  server.on("/Configuration", HTTP_GET, handleConfig);
 
   server.begin();
 }
@@ -50,7 +47,7 @@ void handleRoot(AsyncWebServerRequest *request) {
   String html = "<html><head><title>Pestañas</title></head><body>";
   html += "<h1>ESP32 UCW</h1>";
   html += "<ul>";
-  html += "<li><a href='/Config'>Config</a></li>";
+  html += "<li><a href='/Configuration'>Configuration</a></li>";
   html += "<li><a href='/Data Log'>Data Log</a></li>";
   html += "</ul>";
   html += "</body></html>";
@@ -106,41 +103,72 @@ void handleDataLog(AsyncWebServerRequest *request) {
 }
 
 void handleConfig(AsyncWebServerRequest *request) {
-  String html = "<html><head><title>Nueva Pestaña</title></head><body>";
+  String html = "<html><head><title>UCW Configuration</title></head><body>";
   html += "<h1>ESP32 UCW - Configuration</h1>";
-
-  // Terminal para escribir strings
-  html += "<div id='terminal'>";
-  html += "<textarea id='terminalInput' rows='4' cols='50'></textarea><br>";
-  html += "<button type='button' onclick='writeOnTerminal()'>Send to terminal</button>";
-  html += "<div id='terminalOutput'></div>";
-  html += "</div>";
-
-  html += "<form id='canFrequencyForm'>";
-  html += "<label for='canFrequencyControl'>CAN Frequency:</label>";
-  html += "<select id='canFrequencyControl' name='canFrequencyControl'>";
-  html += "<option value='1M'>1Mbit/s</option>";
-  html += "<option value='100K'>100Kbit/s</option>";
-  html += "</select>";
-  html += "<br><br>";
-  html += "<button type='button' onclick='sendCANCommand()'>Send CAN config</button>";
+  html += "<form>";
+  html += "<p><strong>CAN configuration:</strong></p>";
+  html += "<p><label><input id=\"enableCAN\" name=\"canOption\" type=\"radio\" value=\"enable\" onclick=\"toggleRadio('enableCAN', 'disableCAN')\" /> Enable CAN </label></p>";
+  html += "<p><label><input id=\"disableCAN\" name=\"canOption\" type=\"radio\" value=\"disable\" onclick=\"toggleRadio('disableCAN', 'enableCAN')\" /> Disable CAN </label></p>";
   html += "</form>";
 
-  // Script para manejar el terminal
-  html += "<script>";
-  html += "function writeOnTerminal() {";
-  html += "  var input = document.getElementById('terminalInput').value;";
-  html += "  var output = document.getElementById('terminalOutput');";
-  html += "  output.innerHTML += '<p>' + input + '</p>'";
-  html += "  document.getElementById('terminalInput').value = '';"; // Limpiar el input después de enviar
-  html += "}";
+  html += "<form id=\"canFrequencyForm\">";
+  html += "<label for=\"canFrequencyControl\">CAN Frequency:</label>";
+  html += "<select id=\"canFrequencyControl\" name=\"canFrequencyControl\">";
+  html += "<option value=\"1M\">1Mbit/s</option>";
+  html += "<option value=\"100K\">100Kbit/s</option>";
+  html += "</select>";
+  //html += "<p><button type=\"button\">Send CAN config</button></p>";
+  html += "<p><button type='button' onclick='SendCANconfig'>Send CAN config</button>";
+  html += "</form>";
 
-  // Otras funciones JavaScript
-  html += "function otraFuncion() {";
-  html += "  // Código de la otra función";
+  html += "<form>";
+  html += "<p><strong>UART configuration:</strong></p>";
+  html += "<p><label><input id=\"enableUART\" name=\"uartOption\" type=\"radio\" value=\"enable\" onclick=\"toggleRadio('enableUART', 'disableUART')\" /> Enable UART </label></p>";
+  html += "<p><label><input id=\"disableUART\" name=\"uartOption\" type=\"radio\" value=\"disable\" onclick=\"toggleRadio('disableUART', 'enableUART')\" /> Disable UART </label></p>";
+  html += "</form>";
+
+  html += "<form id=\"uartBaudsForm\">";
+  html += "<label for=\"uartBaudsControl\">UART Bauds:</label>";
+  html += "<select id=\"uartBaudsControl\" name=\"uartBaudsControl\">";
+  html += "<option value=\"9600\">9600</option>";
+  html += "<option value=\"19200\">19200</option>";
+  html += "<option value=\"38400\">38400</option>";
+  html += "<option value=\"57600\">57600</option>";
+  html += "<option value=\"115200\">115200</option>";
+  html += "</select>";
+  html += "<p><button type=\"button\">Send UART config</button></p>";
+  html += "</form>";
+
+  html += "<p><strong>BT configuration:</strong></p>";
+  html += "<p><label><input name=\"showCAN\" type=\"radio\" value=\"yes\" /> Show CAN </label></p>";
+  html += "<p><label><input name=\"showUART\" type=\"radio\" value=\"yes\" /> Show UART </label></p>";
+  html += "<p><label><input name=\"showRTC\" type=\"radio\" value=\"yes\" /> Show RTC </label></p>";
+  html += "<p><button type=\"button\">Send BT config</button></p>";
+
+  html += "<p><strong>Datalogger:</strong></p>";
+  html += "<p><label><input name=\"saveCAN\" type=\"radio\" value=\"yes\" /> Save CAN </label></p>";
+  html += "<p><label><input name=\"saveUART\" type=\"radio\" value=\"yes\" /> Save UART </label></p>";
+  html += "<p><label><input name=\"saveRTC\" type=\"radio\" value=\"yes\" /> Save RTC </label></p>";
+  html += "<p><button type=\"button\">Send Datalogger config</button></p>";
+
+  html += "<p><strong>RTC configuration:</strong></p>";
+  html += "<label for=\"fechaHora\">Select Date &amp; Time:</label>";
+  html += "<input id=\"fechaHora\" name=\"fechaHora\" type=\"datetime-local\" />";
+  html += "<p><button type=\"button\">Send Date &amp; Time</button></p>";
+  html += "</form>";
+
+  html += "<script>";
+  html += "function toggleRadio(checkedId, uncheckedId) {";
+  html += "  var checkedRadio = document.getElementById(checkedId);";
+  html += "  var uncheckedRadio = document.getElementById(uncheckedId);";
+  html += "  uncheckedRadio.checked = false;";
+  html += "}";
+  html += "function SendCANconfig() {";
+  html += "  var xhttp = new XMLHttpRequest();";
+  html += "  xhttp.open('POST', '/CANcontrol', true);";
+  html += "  xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');";
   html += "}";
   html += "</script>";
-
   html += "</body></html>";
   request->send(200, "text/html", html);
 }
@@ -167,7 +195,8 @@ void handleControl(AsyncWebServerRequest *request) {
 }
 
 void handleCANControl(AsyncWebServerRequest *request) {
-  if (request->hasParam("canFrequencyControl", true)) {
+  digitalWrite(ledPin, HIGH);
+  /*if (request->hasParam("canFrequencyControl", true)) {
     String canFrequencyControl = request->getParam("canFrequencyControl", true)->value();
     if (canFrequencyControl == "1M") {
       CANfrequency = 1;
@@ -177,5 +206,5 @@ void handleCANControl(AsyncWebServerRequest *request) {
     request->send(200, "text/plain", "Frecuencia CAN controlada: " + canFrequencyControl);
   } else {
     request->send(400, "text/plain", "Invalid Request");
-  }
+  }*/
 }
