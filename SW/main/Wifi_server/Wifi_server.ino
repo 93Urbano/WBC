@@ -28,7 +28,7 @@ void setup() {
   server.on("/", HTTP_GET, handleRoot);
   server.on("/data", HTTP_GET, handleData);
   server.on("/control", HTTP_POST, handleControl);
-  server.on("/CANcontrol", HTTP_POST, handleCANControl);
+  server.on("/cancontrol", HTTP_POST, handleCANControl);
   server.on("/Data Log", HTTP_GET, handleDataLog);
   server.on("/Configuration", HTTP_GET, handleConfig);
 
@@ -105,20 +105,27 @@ void handleDataLog(AsyncWebServerRequest *request) {
 void handleConfig(AsyncWebServerRequest *request) {
   String html = "<html><head><title>UCW Configuration</title></head><body>";
   html += "<h1>ESP32 UCW - Configuration</h1>";
-  html += "<form>";
   html += "<p><strong>CAN configuration:</strong></p>";
-  html += "<p><label><input id=\"enableCAN\" name=\"canOption\" type=\"radio\" value=\"enable\" onclick=\"toggleRadio('enableCAN', 'disableCAN')\" /> Enable CAN </label></p>";
-  html += "<p><label><input id=\"disableCAN\" name=\"canOption\" type=\"radio\" value=\"disable\" onclick=\"toggleRadio('disableCAN', 'enableCAN')\" /> Disable CAN </label></p>";
-  html += "</form>";
-
   html += "<form id=\"canFrequencyForm\">";
   html += "<label for=\"canFrequencyControl\">CAN Frequency:</label>";
   html += "<select id=\"canFrequencyControl\" name=\"canFrequencyControl\">";
-  html += "<option value=\"1M\">1Mbit/s</option>";
-  html += "<option value=\"100K\">100Kbit/s</option>";
+  html += "<option value=\'1M'>1Mbit/s</option>";
+  html += "<option value=\'100K'>100Kbit/s</option>";
   html += "</select>";
+  html += "<p><label><input id=\"enableCAN\" name=\"canOption\" type=\"radio\" value=\'enable' onclick=\"toggleRadio('enableCAN', 'disableCAN')\" /> Enable CAN </label></p>";
+  html += "<p><label><input id=\"disableCAN\" name=\"canOption\" type=\"radio\" value=\'disable' onclick=\"toggleRadio('disableCAN', 'enableCAN')\" /> Disable CAN </label></p>";
   //html += "<p><button type=\"button\">Send CAN config</button></p>";
-  html += "<p><button type='button' onclick='SendCANconfig'>Send CAN config</button>";
+  html += "<p><button type='button' onclick='SendCANconfig()'>Send CAN config</button>";
+  html += "</form>";
+
+  html += "<form id='controlForm'>";
+  html += "<label for='ledControl'>LED Control:</label>";
+  html += "<select id='ledControl' name='ledControl'>";
+  html += "<option value='on'>LED ON</option>";
+  html += "<option value='off'>LED OFF</option>";
+  html += "</select>";
+  html += "<br><br>";
+  html += "<button type='button' onclick='sendLEDCommand()'>Send LED command</button>";
   html += "</form>";
 
   html += "<form>";
@@ -155,7 +162,6 @@ void handleConfig(AsyncWebServerRequest *request) {
   html += "<label for=\"fechaHora\">Select Date &amp; Time:</label>";
   html += "<input id=\"fechaHora\" name=\"fechaHora\" type=\"datetime-local\" />";
   html += "<p><button type=\"button\">Send Date &amp; Time</button></p>";
-  html += "</form>";
 
   html += "<script>";
   html += "function toggleRadio(checkedId, uncheckedId) {";
@@ -164,9 +170,18 @@ void handleConfig(AsyncWebServerRequest *request) {
   html += "  uncheckedRadio.checked = false;";
   html += "}";
   html += "function SendCANconfig() {";
+  html += "  var canFrequencyControl = document.getElementById('canFrequencyControl').value;";
   html += "  var xhttp = new XMLHttpRequest();";
-  html += "  xhttp.open('POST', '/CANcontrol', true);";
+  html += "  xhttp.open('POST', '/cancontrol', true);";
   html += "  xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');";
+  html += "  xhttp.send('canFrequencyControl=' + canFrequencyControl);";
+  html += "}";
+  html += "function sendLEDCommand() {";
+  html += "  var ledControl = document.getElementById('ledControl').value;";
+  html += "  var xhttp = new XMLHttpRequest();";
+  html += "  xhttp.open('POST', '/control', true);";
+  html += "  xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');";
+  html += "  xhttp.send('ledControl=' + ledControl);";
   html += "}";
   html += "</script>";
   html += "</body></html>";
@@ -195,16 +210,17 @@ void handleControl(AsyncWebServerRequest *request) {
 }
 
 void handleCANControl(AsyncWebServerRequest *request) {
-  digitalWrite(ledPin, HIGH);
-  /*if (request->hasParam("canFrequencyControl", true)) {
+  if (request->hasParam("canFrequencyControl", true)) {
     String canFrequencyControl = request->getParam("canFrequencyControl", true)->value();
     if (canFrequencyControl == "1M") {
-      CANfrequency = 1;
+      digitalWrite(ledPin, HIGH);
+      CANfrequency = 1000000;
     } else if (canFrequencyControl == "100K") {
-      CANfrequency = 0;
+      digitalWrite(ledPin, LOW);
+      CANfrequency = 100000;
     }
-    request->send(200, "text/plain", "Frecuencia CAN controlada: " + canFrequencyControl);
+    request->send(200, "text/plain", "LED controlado: " + canFrequencyControl);
   } else {
     request->send(400, "text/plain", "Invalid Request");
-  }*/
+  }
 }
