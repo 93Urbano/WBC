@@ -1,31 +1,34 @@
-#include "RTC.hpp"
+/*#include "RTC.hpp"
 #include "SD.hpp"
 #include "UART.hpp"
 #include "I2C.hpp"
 #include "BLE.hpp"
-#include "CAN.hpp"
+#include "CAN.hpp"*/
+#include "WiFiserver.h"
 
-uint8_t LEDpin = 0;
+uint LEDpin = 0;
 bool LEDstate = 0;
+
+WiFiserver wifi1;
 
 void setup() 
 {
   pinMode(LEDpin,OUTPUT);
   digitalWrite(LEDpin,LOW);
-  UARTInit();
+  /*UARTInit();
   I2CInit();
   RTCInit();
   SDInit();
   BLEInit();
-  CANInit();
-  
+  CANInit();*/
+  wifi1.WiFiserverInit();
 }
 
 void loop() 
 {
-  BLETest();
+  /*BLETest();
   SDTest();
-  UARTTest();
+  UARTTest();*/
   
   delay(5000);
   LEDstate = !LEDstate;

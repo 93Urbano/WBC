@@ -1,32 +1,33 @@
-#include <WiFi.h>
-#include <ESPAsyncWebServer.h>
+//************************************//
+//         WiFiserver.cpp             //
+//************************************// 
+#include "WiFiserver.h"
 
-const char* ssid     = "Galaxy S20+b24a";
-const char* password = "davidjimenez";
+int WiFiserver::rpmValue = 0;
+int WiFiserver::tpsPercentage = 0;
+int WiFiserver::brakePercentage = 0;
+int WiFiserver::ClutchState = 0;
+uint WiFiserver::CANfrequency = 100000;
+bool WiFiserver::CANactive = 0;
+uint WiFiserver::UARTBauds = 115200;
+bool WiFiserver::UARTactive = 0;
+bool WiFiserver::CANShow = 0;
+bool WiFiserver::UARTShow = 0;
+bool WiFiserver::RTCShow = 0;
+bool WiFiserver::CANSave = 0;
+bool WiFiserver::UARTSave = 0;
+bool WiFiserver::RTCSave = 0;
+
+uint WiFiserver::ledPin = 0;
 
 AsyncWebServer server(80);
 
-int rpmValue = 0;
-int tpsPercentage = 0;
-int brakePercentage = 0;
-int ClutchState = 0;
-int ledPin = 0;
-uint CANfrequency = 1000000;
-bool CANactive = 0;
-uint UARTBauds = 115200;
-bool UARTactive = 0;
-bool CANShow = 0;
-bool UARTShow = 0;
-bool RTCShow = 0;
-bool CANSave = 0;
-bool UARTSave = 0;
-bool RTCSave = 0;
+void WiFiserver::WiFiserverInit()
+{
+  const char* ssid     = "Galaxy S20+b24a";
+  const char* password = "davidjimenez";
 
-void setup() {
-  Serial.begin(115200);
-  pinMode(ledPin, OUTPUT);
-  digitalWrite(ledPin, LOW);
-
+  
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
@@ -48,15 +49,7 @@ void setup() {
   server.begin();
 }
 
-void loop() {
-  delay(1000);
-  rpmValue += 100;
-  tpsPercentage += 5;
-  brakePercentage += 5;
-  ClutchState +=1;
-}
-
-void handleRoot(AsyncWebServerRequest *request) {
+void WiFiserver::handleRoot(AsyncWebServerRequest *request) {
   String html = "<html><head><title>ESP32 WBC</title></head><body>";
   html += "<h1>ESP32 WBC</h1>";
   html += "<ul>";
@@ -67,7 +60,7 @@ void handleRoot(AsyncWebServerRequest *request) {
   request->send(200, "text/html", html);
 }
 
-void handleDataLog(AsyncWebServerRequest *request) {
+void WiFiserver::handleDataLog(AsyncWebServerRequest *request) {
   String html = "<html><head><title>WBC Datalogger</title></head><body>";
   html += "<h1>ESP32 WBC - Datalogger</h1>";
   html += "<form id='controlForm'>";
@@ -115,7 +108,7 @@ void handleDataLog(AsyncWebServerRequest *request) {
   request->send(200, "text/html", html);
 }
 
-void handleConfig(AsyncWebServerRequest *request) {
+void WiFiserver::handleConfig(AsyncWebServerRequest *request) {
   String html = "<html><head><title>WBC Configuration</title></head><body>";
   html += "<h1>ESP32 WBC - Configuration</h1>";
   html += "<p><strong>CAN configuration:</strong></p>";
@@ -227,12 +220,12 @@ void handleConfig(AsyncWebServerRequest *request) {
 
 
 
-void handleData(AsyncWebServerRequest *request) {
+void WiFiserver::handleData(AsyncWebServerRequest *request) {
   String data = String(rpmValue) + ";" + String(tpsPercentage) + ";" + String(brakePercentage) + ";" + String(ClutchState);
   request->send(200, "text/plain", data);
 }
 
-void handleControl(AsyncWebServerRequest *request) {
+void WiFiserver::handleControl(AsyncWebServerRequest *request) {
   if (request->hasParam("ledControl", true)) {
     String ledControl = request->getParam("ledControl", true)->value();
     if (ledControl == "on") {
@@ -246,7 +239,7 @@ void handleControl(AsyncWebServerRequest *request) {
   }
 }
 
-void handleCANControl(AsyncWebServerRequest *request) {
+void WiFiserver::handleCANControl(AsyncWebServerRequest *request) {
   if (request->hasParam("canFrequencyControl", true)) {
     String canFrequencyControl = request->getParam("canFrequencyControl", true)->value();
     if (canFrequencyControl == "1M")  CANfrequency = 1000000;
@@ -267,7 +260,7 @@ void handleCANControl(AsyncWebServerRequest *request) {
   }
 }
 
-void handleUARTControl(AsyncWebServerRequest *request) {
+void WiFiserver::handleUARTControl(AsyncWebServerRequest *request) {
   if (request->hasParam("uartBaudsControl", true)) {
     String uartBaudsControl = request->getParam("uartBaudsControl", true)->value();
     if (uartBaudsControl == "9600") UARTBauds = 9600;
@@ -291,7 +284,7 @@ void handleUARTControl(AsyncWebServerRequest *request) {
   }
 }
 
-void handleBTControl(AsyncWebServerRequest *request) {
+void WiFiserver::handleBTControl(AsyncWebServerRequest *request) {
   String showCAN = request->getParam("showCAN", true)->value();
   String showUART = request->getParam("showUART", true)->value();
   String showRTC = request->getParam("showRTC", true)->value();
@@ -303,7 +296,7 @@ void handleBTControl(AsyncWebServerRequest *request) {
   else  RTCShow = 0;
 }
 
-void handleDATAControl(AsyncWebServerRequest *request) {
+void WiFiserver::handleDATAControl(AsyncWebServerRequest *request) {
   String saveCAN = request->getParam("saveCAN", true)->value();
   String saveUART = request->getParam("saveUART", true)->value();
   String saveRTC = request->getParam("saveRTC", true)->value();
@@ -315,7 +308,7 @@ void handleDATAControl(AsyncWebServerRequest *request) {
   else  RTCSave = 0;
 }
 
-void handleDATETIME(AsyncWebServerRequest *request) {
+void WiFiserver::handleDATETIME(AsyncWebServerRequest *request) {
   String datetime = request->getParam("fechaHora", true)->value();
   Serial.print("Fecha y hora seleccionada: ");
   Serial.println(datetime);
