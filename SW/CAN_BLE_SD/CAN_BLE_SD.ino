@@ -1,3 +1,15 @@
+// Date and time functions using a DS3231 RTC connected via I2C and Wire lib
+#include "RTClib.h"
+
+RTC_DS3231 rtc;
+
+char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+#define I2C_SDA 1
+#define I2C_SCL 2
+
+String DateNameFileString;
+
+//SD
 #include "FS.h"
 #include "SD.h"
 #include "SPI.h"
@@ -132,6 +144,30 @@ void BLEInit()
     pServer->getAdvertising()->start();
     Serial.println("Waiting a client connection to notify...");
     pTxCharacteristic->setValue("Hello World");
+}
+
+void RTCInit()
+{
+  Wire.begin(I2C_SDA, I2C_SCL);
+  #ifndef ESP8266
+    while (!Serial); // wait for serial port to connect. Needed for native USB
+  #endif
+
+  if (! rtc.begin()) {
+    Serial.println("Couldn't find RTC");
+    Serial.flush();
+    while (1) delay(10);
+  }
+
+  if (rtc.lostPower()) {
+    Serial.println("RTC lost power, let's set the time!");
+    // When time needs to be set on a new device, or after a power loss, the
+    // following line sets the RTC to the date & time this sketch was compiled
+    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+    // This line sets the RTC with an explicit date & time, for example to set
+    // January 21, 2014 at 3am you would call:
+    // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
+  }
 }
 
 void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
@@ -323,10 +359,41 @@ void SDInit()
   listDir(SD, "/", 0);
 }
 
-void SDsaveString()
+String GetTimeString ()
 {
+  DateTime now = rtc.now(); // Obtiene la fecha y hora actual del módulo RTC
+  
+  // Construye un string con el formato "HH:MM:SS"
+  String hora = String(now.hour());
+  String minutos = String(now.minute());
+  String segundos = String(now.second());
 
+  // Asegura que la hora, minutos y segundos tengan dos dígitos
+  if (hora.length() == 1) hora = '0' + hora;
+  if (minutos.length() == 1) minutos = '0' + minutos;
+  if (segundos.length() == 1) segundos = '0' + segundos;
+
+  return hora + ":" + minutos + ":" + segundos;
 }
+
+String GetDateFileName() {
+  DateTime now = rtc.now(); // Obtiene la fecha y hora actual del módulo RTC
+
+  // Construye un string con el formato "YYMMDDHH"
+  String dia = String(now.day());
+  String mes = String(now.month());
+  String ano = String(now.year() - 2000); // Restamos 2000 ya que el año se almacena como los últimos dos dígitos
+  String hora = String(now.hour());
+
+  // Asegura que el día, mes, año, hora, minutos y segundos tengan dos dígitos
+  if (dia.length() == 1) dia = '0' + dia;
+  if (mes.length() == 1) mes = '0' + mes;
+  if (ano.length() == 1) ano = '0' + ano;
+  if (hora.length() == 1) hora = '0' + hora;
+
+  return "/" + ano + mes + dia + hora + ".txt";
+}
+
 
 void setup()
 {
@@ -340,30 +407,35 @@ void setup()
     BLEInit();
     //SD
     SDInit();
+    //RTC
+    RTCInit();
 }
 
 void loop ()
 {
+  DateNameFileString = GetDateFileName();
+  const char* DateNameFile = DateNameFileString.c_str();
   //Wait for message to be received
   twai_message_t message;
   if (twai_receive(&message, pdMS_TO_TICKS(100)) == ESP_OK) 
   {
     WriteString2BLE("\n");
-    appendFile(SD, "/hello.txt", "\n");
+    appendFile(SD, DateNameFile, "\n");
     if (!(message.rtr)) 
     {
-      std::sprintf(buffer, "Rx 2 0x%X ", message.identifier);
+      String Timeget = GetTimeString();
+      std::sprintf(buffer, "%s 0x%X ", Timeget.c_str(), message.identifier);
       std::string formattedString(buffer);
       const char* cString = formattedString.c_str();
       WriteString2BLE(const_cast<char*>(cString));
-      appendFile(SD, "/hello.txt", const_cast<char*>(cString));
+      appendFile(SD, DateNameFile, const_cast<char*>(cString));
       for (int i = 0; i < message.data_length_code; i++) 
       {
           std::sprintf(buffer, "%X ", message.data[i]);
           std::string formattedString(buffer);
           const char* cString = formattedString.c_str();
           WriteString2BLE(const_cast<char*>(cString));
-          appendFile(SD, "/hello.txt", const_cast<char*>(cString));
+          appendFile(SD, DateNameFile, const_cast<char*>(cString));
       }
       digitalWrite(LED, 1);
     }
