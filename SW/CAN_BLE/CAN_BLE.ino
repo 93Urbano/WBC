@@ -136,39 +136,29 @@ void loop ()
 {
     //Wait for message to be received
     twai_message_t message;
-    if (twai_receive(&message, pdMS_TO_TICKS(100)) == ESP_OK) 
-    {
-        printf("Message received\n");
-    }
-
-    //Process received message
-    if (message.extd) 
-    {
-        printf("Message is in Extended Format\n");
-    } 
-    else 
-    {
-        printf("Message is in Standard Format\n");
-    }
   
     if (deviceConnected) 
     {
+      if (twai_receive(&message, pdMS_TO_TICKS(100)) == ESP_OK) 
+      {
         WriteString2BLE("\n");
-        std::sprintf(buffer, "Rx 2 0x%X ", message.identifier);
-        std::string formattedString(buffer);
-        const char* cString = formattedString.c_str();
-        WriteString2BLE(const_cast<char*>(cString));
+        
         if (!(message.rtr)) 
         {
-            for (int i = 0; i < message.data_length_code; i++) 
-            {
-                std::sprintf(buffer, "%X ", message.data[i]);
-                std::string formattedString(buffer);
-                const char* cString = formattedString.c_str();
-                WriteString2BLE(const_cast<char*>(cString));
-            }
-            digitalWrite(LED, 1);
+          std::sprintf(buffer, "Rx 2 0x%X ", message.identifier);
+          std::string formattedString(buffer);
+          const char* cString = formattedString.c_str();
+          WriteString2BLE(const_cast<char*>(cString));
+          for (int i = 0; i < message.data_length_code; i++) 
+          {
+              std::sprintf(buffer, "%X ", message.data[i]);
+              std::string formattedString(buffer);
+              const char* cString = formattedString.c_str();
+              WriteString2BLE(const_cast<char*>(cString));
+          }
+          digitalWrite(LED, 1);
         }
+      }
     }
     // disconnecting
     if (!deviceConnected && oldDeviceConnected) 
