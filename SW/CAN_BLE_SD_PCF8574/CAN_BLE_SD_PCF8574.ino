@@ -7,6 +7,11 @@ char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursd
 #define I2C_SDA 1
 #define I2C_SCL 2
 
+//PCF8574
+const int pcfAddress = 0x27;
+//#include <Wire.h>
+
+
 String DateNameFileString;
 
 //SD
@@ -359,6 +364,39 @@ void SDInit()
   listDir(SD, "/", 0);
 }
 
+uint8_t PCF8574()
+{
+  short channel = 1;
+  static byte PCF8574value = 0;
+
+  DateNameFileString = GetDateFileName();
+  const char* DateNameFile = DateNameFileString.c_str();
+  String Timeget = GetTimeString();
+  std::sprintf(buffer, "%s PCF8574 %X ", Timeget.c_str(), PCF8574value);
+  std::string formattedString(buffer);
+  const char* cString = formattedString.c_str();
+  WriteString2BLE(const_cast<char*>(cString));
+  appendFile(SD, DateNameFile, const_cast<char*>(cString));
+  WriteString2BLE("\n");
+  appendFile(SD, DateNameFile, "\n");
+  // Mostrar el valor por puerto serie
+  Serial.print("Valor PCF8574: ");
+  Serial.println(PCF8574value);
+
+  // Leer dato de canal 'channel'
+  Wire.requestFrom(pcfAddress, 1 << channel);
+  if (Wire.available())
+  {
+    PCF8574value = Wire.read();
+    // Mostrar el valor por puerto serie
+    Serial.print("Valor PCF8574: ");
+    Serial.println(PCF8574value);
+  }
+  Wire.endTransmission();
+  //Serial.println("1");
+  return PCF8574value;
+}
+
 String GetTimeString ()
 {
   DateTime now = rtc.now(); // Obtiene la fecha y hora actual del módulo RTC
@@ -414,15 +452,20 @@ void setup()
 
 void loop ()
 {
+  static uint8_t PCF874byte;
+  PCF874byte = PCF8574();
   DateNameFileString = GetDateFileName();
+  //Serial.println("2");
   const char* DateNameFile = DateNameFileString.c_str();
   //Wait for message to be received
   twai_message_t message;
+  //Serial.println("3");
   if (twai_receive(&message, pdMS_TO_TICKS(100)) == ESP_OK) 
   {
+    //Serial.println("4");
     WriteString2BLE("\n");
     appendFile(SD, DateNameFile, "\n");
-    if (!(message.rtr)) 
+    if (!(message.rtr) && (message.identifier = 0x005)) 
     {
       String Timeget = GetTimeString();
       std::sprintf(buffer, "%s 0x%X ", Timeget.c_str(), message.identifier);
@@ -439,8 +482,15 @@ void loop ()
           appendFile(SD, DateNameFile, const_cast<char*>(cString));
       }
       digitalWrite(LED, 1);
+      if (message.data[1] != PCF874byte)
+      {
+        WriteString2BLE("MISSMATCH FAULT\n");
+        appendFile(SD, DateNameFile, "MISSMATCH FAULT\n"); 
+        Serial.print("MISSMATCH FAULT");
+      }
     }
   }
+  //Serial.println("5");
   // disconnecting
   if (!deviceConnected && oldDeviceConnected) 
   {
@@ -448,10 +498,13 @@ void loop ()
       Serial.println("start advertising");
       oldDeviceConnected = deviceConnected;
       digitalWrite(LED, 0);
+      //Serial.println("6");
   }
+  //Serial.println("7");
   // connecting
   if (deviceConnected && !oldDeviceConnected) 
   {
+      //Serial.println("8");
       // do stuff here on connecting
       oldDeviceConnected = deviceConnected;
   }

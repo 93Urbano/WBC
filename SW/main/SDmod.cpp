@@ -5,6 +5,8 @@
 #include "SDmod.hpp"
 
 
+SPIClass spi = SPIClass(HSPI);
+
 void SDmodule::SDinit()
 {
     spi.begin(SCK, MISO, MOSI, CS);

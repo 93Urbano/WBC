@@ -12,8 +12,6 @@
 #define MOSI  35
 #define CS  38
 
-SPIClass spi = SPIClass(HSPI);
-
 class SDmodule
 {
     private: 
